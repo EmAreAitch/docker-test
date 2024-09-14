@@ -20,6 +20,7 @@ services:
       - db
     environment:
       DATABASE_URL: postgres://postgres:${DB_PASSWORD}@db:5432/docker_test_development
+      DATABASE_PASSWORD: ${DB_PASSWORD}
 
 volumes:
   postgres_data:
