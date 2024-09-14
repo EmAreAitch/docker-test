@@ -13,7 +13,7 @@ services:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
-      - .:/myapp
+      - .:/rails
     ports:
       - "3000:3000"
     depends_on:
@@ -21,7 +21,8 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:${DB_PASSWORD}@db:5432/docker_test_development
       DATABASE_PASSWORD: ${DB_PASSWORD}
-      RAILS_ENV: development
+      RAILS_ENV: ${RAILS_ENV:-development}
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
 
 volumes:
   postgres_data:
