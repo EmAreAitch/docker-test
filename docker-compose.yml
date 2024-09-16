@@ -8,10 +8,15 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5433:5432"
+    logging:
+      driver: "none"
 
   web:
-    build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    stdin_open: true
+    tty: true
     volumes:
       - .:/rails
     ports:
