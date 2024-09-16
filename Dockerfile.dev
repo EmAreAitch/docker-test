@@ -1,0 +1,48 @@
+# syntax = docker/dockerfile:1
+
+# Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
+ARG RUBY_VERSION=3.3.4
+FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim as base
+
+# Rails app lives here
+WORKDIR /rails
+
+# Set development environment
+ENV RAILS_ENV="development" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_WITHOUT="test" \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3
+
+# Install dependencies needed for development
+RUN apt-get clean && \
+    apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    build-essential curl git libpq-dev libvips pkg-config \
+    vim nodejs npm yarn postgresql-client && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install application gems (including development gems)
+COPY Gemfile Gemfile.lock ./ 
+RUN bundle install
+
+# Install Node.js packages
+# COPY package.json yarn.lock ./
+# RUN yarn install
+
+# Copy the entire application code (useful during active development)
+COPY . .
+
+# Set up the database for development (replace 'db:setup' with 'db:create' if needed)
+# RUN ./bin/rails db:setup
+
+# Run and own only the runtime files as a non-root user for security
+# RUN useradd rails --create-home --shell /bin/bash && \
+#     chown -R rails:rails db log storage tmp
+# USER rails:rails
+
+# Expose port 3000 to access the development server
+EXPOSE 3000
+
+# Allow for interactive usage in development (like binding.pry)
+# CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
